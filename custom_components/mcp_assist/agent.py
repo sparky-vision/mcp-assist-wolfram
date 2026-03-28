@@ -1322,6 +1322,7 @@ class MCPAssistConversationEntity(ConversationEntity):
 
                 # Execute the tool
                 result = await self._call_mcp_tool(tool_name, arguments)
+                content = ""
 
                 # Format result for OpenAI
                 if "error" in result:
