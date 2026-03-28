@@ -1520,6 +1520,7 @@ class MCPAssistConversationEntity(ConversationEntity):
         ollama_messages = []
         for msg in messages:
             if msg.get("role") == "tool":
+                _LOGGER.warning(f"TOOL MSG KEYS: {list(msg.keys())} tool_name={msg.get('tool_name', 'MISSING')}")
                 ollama_messages.append(
                     {
                         "role": "tool",
