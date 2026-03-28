@@ -1837,9 +1837,8 @@ class MCPAssistConversationEntity(ConversationEntity):
                                             if "arguments" in func:
                                                 if idx not in tool_arg_buffers:
                                                     tool_arg_buffers[idx] = ""
-                                                tool_arg_buffers[idx] += func[
-                                                    "arguments"
-                                                ]
+                                                args = func["arguments"]
+                                                tool_arg_buffers[idx] += args if isinstance(args, str) else json.dumps(args)
 
                                                 # Try to parse arguments
                                                 try:
