@@ -1308,13 +1308,13 @@ class MCPAssistConversationEntity(ConversationEntity):
             try:
                 # Parse arguments based on server type
                 if self.server_type == SERVER_TYPE_OLLAMA:
-                    # Ollama: Arguments are already parsed objects
-                    arguments = (
-                        arguments_str
-                        if isinstance(arguments_str, dict)
-                        else json.loads(arguments_str)
-                        if arguments_str
-                        else {}
+                    results.append(
+                        {
+                            "role": "tool",
+                            "tool_name": tool_name,
+                            "tool_call_id": tool_call_id,
+                            "content": content if content is not None else "",
+                        }
                     )
                 else:
                     # OpenAI: Arguments are JSON strings
@@ -1354,6 +1354,7 @@ class MCPAssistConversationEntity(ConversationEntity):
                     results.append(
                         {
                             "role": "tool",
+                            "tool_name": tool_name,
                             "tool_call_id": tool_call_id,
                             "content": content if content is not None else "",
                         }
@@ -1519,7 +1520,11 @@ class MCPAssistConversationEntity(ConversationEntity):
         for msg in messages:
             if msg.get("role") == "tool":
                 ollama_messages.append(
-                    {"role": "tool", "content": msg.get("content", "")}
+                    {
+                        "role": "tool",
+                        "tool_name": msg.get("tool_name", ""),
+                        "content": msg.get("content", ""),
+                    }
                 )
             else:
                 ollama_messages.append(msg)
