@@ -1351,10 +1351,10 @@ class MCPAssistConversationEntity(ConversationEntity):
 
                 # Format result based on server type
                 if self.server_type == SERVER_TYPE_OLLAMA:
-                    # Ollama doesn't use tool_call_id
                     results.append(
                         {
                             "role": "tool",
+                            "tool_call_id": tool_call_id,
                             "content": content if content is not None else "",
                         }
                     )
@@ -1374,9 +1374,12 @@ class MCPAssistConversationEntity(ConversationEntity):
                 _LOGGER.error(f"Error executing tool {tool_name}: {e}")
                 # Format error result based on server type
                 if self.server_type == SERVER_TYPE_OLLAMA:
-                    # Ollama doesn't use tool_call_id
                     results.append(
-                        {"role": "tool", "content": json.dumps({"error": str(e)})}
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call_id,
+                            "content": json.dumps({"error": str(e)}),
+                        }
                     )
                 else:
                     # OpenAI format with tool_call_id
