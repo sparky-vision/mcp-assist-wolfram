@@ -48,6 +48,7 @@ from .const import (
     CONF_DEBUG_MODE,
     CONF_ENABLE_CUSTOM_TOOLS,
     CONF_BRAVE_API_KEY,
+    CONF_WOLFRAM_APP_ID,
     CONF_ALLOWED_IPS,
     CONF_SEARCH_PROVIDER,
     CONF_ENABLE_GAP_FILLING,
@@ -88,6 +89,7 @@ from .const import (
     DEFAULT_DEBUG_MODE,
     DEFAULT_ENABLE_CUSTOM_TOOLS,
     DEFAULT_BRAVE_API_KEY,
+    DEFAULT_WOLFRAM_APP_ID,
     DEFAULT_ALLOWED_IPS,
     DEFAULT_SEARCH_PROVIDER,
     DEFAULT_ENABLE_GAP_FILLING,
@@ -939,12 +941,16 @@ class MCPAssistConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                                 "value": "brave",
                                 "label": "Brave Search (requires API key)",
                             },
+                            {"value": "wolfram", "label": "Wolfram Alpha (requires App ID)"},
                         ],
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
                 vol.Optional(
                     CONF_BRAVE_API_KEY, default=DEFAULT_BRAVE_API_KEY
+                ): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
+                vol.Optional(
+                    CONF_WOLFRAM_APP_ID, default=DEFAULT_WOLFRAM_APP_ID
                 ): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
                 vol.Optional(CONF_ALLOWED_IPS, default=DEFAULT_ALLOWED_IPS): str,
                 vol.Optional(
@@ -1481,6 +1487,7 @@ class MCPAssistOptionsFlow(config_entries.OptionsFlow):
                                 "value": "brave",
                                 "label": "Brave Search (requires API key)",
                             },
+                            {"value": "wolfram", "label": "Wolfram Alpha (requires App ID)"},
                         ],
                         mode=SelectSelectorMode.DROPDOWN,
                     )
@@ -1490,6 +1497,13 @@ class MCPAssistOptionsFlow(config_entries.OptionsFlow):
                     default=sys_options.get(
                         CONF_BRAVE_API_KEY,
                         sys_data.get(CONF_BRAVE_API_KEY, DEFAULT_BRAVE_API_KEY),
+                    ),
+                ): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
+                vol.Optional(
+                    CONF_WOLFRAM_APP_ID,
+                    default=sys_options.get(
+                        CONF_WOLFRAM_APP_ID,
+                        sys_data.get(CONF_WOLFRAM_APP_ID, DEFAULT_WOLFRAM_APP_ID),
                     ),
                 ): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
                 vol.Optional(

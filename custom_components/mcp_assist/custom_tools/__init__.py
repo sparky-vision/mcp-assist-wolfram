@@ -22,7 +22,6 @@ class CustomToolsLoader:
         if search_provider == "brave":
             try:
                 from .brave_search import BraveSearchTool
-                # Get Brave API key from system entry (shared setting)
                 api_key = self._get_brave_api_key()
                 self.tools["search"] = BraveSearchTool(self.hass, api_key)
                 await self.tools["search"].initialize()
@@ -39,8 +38,18 @@ class CustomToolsLoader:
             except Exception as e:
                 _LOGGER.error(f"Failed to initialize DuckDuckGo Search tool: {e}")
 
+        elif search_provider == "wolfram":
+            try:
+                from .wolfram_search import WolframSearchTool
+                app_id = self._get_wolfram_app_id()
+                self.tools["search"] = WolframSearchTool(self.hass, app_id)
+                await self.tools["search"].initialize()
+                _LOGGER.debug("✅ Wolfram Alpha Search tool initialized")
+            except Exception as e:
+                _LOGGER.error(f"Failed to initialize Wolfram Search tool: {e}")
+
         # Load read_url tool if search is enabled
-        if search_provider in ["brave", "duckduckgo"]:
+        if search_provider in ["brave", "duckduckgo", "wolfram"]:
             try:
                 from .read_url import ReadUrlTool
                 self.tools["read_url"] = ReadUrlTool(self.hass)
@@ -51,23 +60,19 @@ class CustomToolsLoader:
 
     def _get_shared_setting(self, key: str, default: Any = None) -> Any:
         """Get a shared setting from system entry with fallback to profile entry."""
-        # Import here to avoid circular dependency
         from .. import get_system_entry
 
-        # Try to get from system entry first
         system_entry = get_system_entry(self.hass)
         if system_entry:
             value = system_entry.options.get(key, system_entry.data.get(key))
             if value is not None:
                 return value
 
-        # Fallback to profile entry for backward compatibility
         if self.entry:
             value = self.entry.options.get(key, self.entry.data.get(key))
             if value is not None:
                 return value
 
-        # Return default
         return default
 
     def _get_search_provider(self) -> str:
@@ -88,6 +93,11 @@ class CustomToolsLoader:
         """Get Brave API key (shared setting)."""
         from ..const import CONF_BRAVE_API_KEY, DEFAULT_BRAVE_API_KEY
         return self._get_shared_setting(CONF_BRAVE_API_KEY, DEFAULT_BRAVE_API_KEY)
+
+    def _get_wolfram_app_id(self) -> str:
+        """Get Wolfram Alpha App ID (shared setting)."""
+        from ..const import CONF_WOLFRAM_APP_ID, DEFAULT_WOLFRAM_APP_ID
+        return self._get_shared_setting(CONF_WOLFRAM_APP_ID, DEFAULT_WOLFRAM_APP_ID)
 
     def get_tool_definitions(self) -> List[Dict[str, Any]]:
         """Get MCP tool definitions for all enabled tools."""
